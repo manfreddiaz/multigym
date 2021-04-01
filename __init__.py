@@ -18,4 +18,5 @@
 import gym_minigrid.wrappers
 
 # Import the envs module so that envs register themselves
-import social_rl.gym_multigrid.envs
+import src.envs
+from src.multigrid import *

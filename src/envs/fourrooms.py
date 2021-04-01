@@ -21,7 +21,7 @@ in one of four rooms.
 """
 
 import gym_minigrid.minigrid as minigrid
-from social_rl.gym_multigrid import multigrid
+import multigrid
 from social_rl.gym_multigrid.register import register
 
 

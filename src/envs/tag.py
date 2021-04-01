@@ -21,8 +21,8 @@ near the other team and the other team has a symmetric penalty.
 """
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-from social_rl.gym_multigrid import multigrid
-from social_rl.gym_multigrid.register import register
+import multigrid
+from register import register
 
 
 class TagEnv(multigrid.MultiGridEnv):

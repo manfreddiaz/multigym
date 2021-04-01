@@ -21,8 +21,8 @@ These have a goal on the other side of a door that must be opened with a key.
 import math
 
 import gym_minigrid.minigrid as minigrid
-from social_rl.gym_multigrid import multigrid
-from social_rl.gym_multigrid.register import register
+import multigrid as multigrid
+from .register import register
 
 
 class DoorKeyEnv(multigrid.MultiGridEnv):

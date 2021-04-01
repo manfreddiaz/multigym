@@ -20,16 +20,16 @@ simultaneously registered with Gym as a package.
 """
 
 # Import all environments and register them, so pylint: disable=wildcard-import
-from social_rl.gym_multigrid.envs.adversarial import *
-from social_rl.gym_multigrid.envs.cluttered import *
-from social_rl.gym_multigrid.envs.coingame import *
-from social_rl.gym_multigrid.envs.doorkey import *
-from social_rl.gym_multigrid.envs.empty import *
-from social_rl.gym_multigrid.envs.fourrooms import *
-from social_rl.gym_multigrid.envs.gather import *
-from social_rl.gym_multigrid.envs.lava_walls import *
-from social_rl.gym_multigrid.envs.maze import *
-from social_rl.gym_multigrid.envs.meetup import *
-from social_rl.gym_multigrid.envs.stag_hunt import *
-from social_rl.gym_multigrid.envs.tag import *
-from social_rl.gym_multigrid.envs.tasklist import *
+from .adversarial import *
+from .cluttered import *
+from .coingame import *
+from .doorkey import *
+from .empty import *
+from .fourrooms import *
+from .gather import *
+from .lava_walls import *
+from .maze import *
+from .meetup import *
+from .stag_hunt import *
+from .tag import *
+from .tasklist import *

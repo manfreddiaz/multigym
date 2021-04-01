@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Import needed to trigger env registration, so pylint: disable=unused-import
-from social_rl import gym_multigrid
+import multigym
 
 
 def parse_args():

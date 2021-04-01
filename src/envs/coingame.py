@@ -23,8 +23,8 @@ their color or teammates' colors.
 import gym
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-from social_rl.gym_multigrid import multigrid
-from social_rl.gym_multigrid.register import register
+import multigrid
+from register import register
 
 
 class Coin(minigrid.Ball):

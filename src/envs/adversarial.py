@@ -33,8 +33,8 @@ import networkx as nx
 from networkx import grid_graph
 import numpy as np
 
-from social_rl.gym_multigrid import multigrid
-from social_rl.gym_multigrid import register
+import multigrid
+from register import register
 
 
 class AdversarialEnv(multigrid.MultiGridEnv):
@@ -547,32 +547,32 @@ if hasattr(__loader__, 'name'):
 elif hasattr(__loader__, 'fullname'):
   module_path = __loader__.fullname
 
-register.register(
+register(
     env_id='MultiGrid-Adversarial-v0',
     entry_point=module_path + ':AdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-ReparameterizedAdversarial-v0',
     entry_point=module_path + ':ReparameterizedAdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-MiniAdversarial-v0',
     entry_point=module_path + ':MiniAdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-MiniReparameterizedAdversarial-v0',
     entry_point=module_path + ':MiniReparameterizedAdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-NoisyAdversarial-v0',
     entry_point=module_path + ':NoisyAdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-MediumAdversarial-v0',
     entry_point=module_path + ':MediumAdversarialEnv'
 )
