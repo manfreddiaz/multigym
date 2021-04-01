@@ -20,8 +20,8 @@ One agent must toggle the stag while another agent is adjacent.
 """
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class Stag(minigrid.Box):

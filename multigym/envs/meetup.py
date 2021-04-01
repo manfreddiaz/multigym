@@ -18,10 +18,11 @@
 
 The agents must meet at one of several predetermined locations.
 """
-import gym_minigrid.minigrid as minigrid
 import numpy as np
-import multigrid
-from register import register
+import gym_minigrid.minigrid as minigrid
+
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class MeetupEnv(multigrid.MultiGridEnv):

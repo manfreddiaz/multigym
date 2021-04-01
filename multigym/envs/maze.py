@@ -21,8 +21,8 @@ location of the agent, and the goal location.
 """
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class MazeEnv(multigrid.MultiGridEnv):

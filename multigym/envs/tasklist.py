@@ -29,8 +29,8 @@ performing the task early.
 import gym
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-from social_rl.gym_multigrid import multigrid
-from social_rl.gym_multigrid.register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class TaskListEnv(multigrid.MultiGridEnv):

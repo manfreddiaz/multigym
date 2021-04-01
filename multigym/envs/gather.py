@@ -20,8 +20,8 @@ The agents must pick up (move on top of) items in the environment.
 """
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class GatherEnv(multigrid.MultiGridEnv):

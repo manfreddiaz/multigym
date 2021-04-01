@@ -19,10 +19,11 @@
 The agents are split into two teams, where one team is rewarded for being
 near the other team and the other team has a symmetric penalty.
 """
-import gym_minigrid.minigrid as minigrid
 import numpy as np
-import multigrid
-from register import register
+
+import gym_minigrid.minigrid as minigrid
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class TagEnv(multigrid.MultiGridEnv):

@@ -23,8 +23,8 @@ their color or teammates' colors.
 import gym
 import gym_minigrid.minigrid as minigrid
 import numpy as np
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class Coin(minigrid.Ball):
@@ -144,7 +144,7 @@ class CoinGameEnv(multigrid.MultiGridEnv):
 
   def step(self, action):
     self._reward = 0
-    obs, _, done, info = multigrid.MultiGridEnv.step(self, action)
+    obs, _, done, info = multigrid.MultiGridEnv.step(self, action) # TODO(Manfred) shouldn't this be a call to super?
     obs = self._get_color_obs(obs)
     for obj in self.objects:
       if obj.cur_pos is None:  # Object has been picked up

@@ -18,8 +18,8 @@
 """
 
 import gym_minigrid.minigrid as minigrid
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class ClutteredMultiGrid(multigrid.MultiGridEnv):

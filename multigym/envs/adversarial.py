@@ -33,8 +33,8 @@ import networkx as nx
 from networkx import grid_graph
 import numpy as np
 
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class AdversarialEnv(multigrid.MultiGridEnv):
@@ -577,12 +577,12 @@ register(
     entry_point=module_path + ':MediumAdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-GoalLastAdversarial-v0',
     entry_point=module_path + ':GoalLastAdversarialEnv'
 )
 
-register.register(
+register(
     env_id='MultiGrid-MiniGoalLastAdversarial-v0',
     entry_point=module_path + ':MiniGoalLastAdversarialEnv'
 )

@@ -19,8 +19,8 @@
 
 import gym_minigrid.minigrid as minigrid
 import gym_minigrid.rendering as rendering
-import multigrid
-from register import register
+import multigym.multigrid as multigrid
+from multigym.register import register
 
 
 class LavaWall(minigrid.WorldObj):
