@@ -25,12 +25,14 @@ import numpy as np
 
 # Import needed to trigger env registration, so pylint: disable=unused-import
 import multigym
+import multigym.ctf
+
 
 
 def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument(
-      '--env_name', type=str, default='MultiGrid-Tag-v0',
+      '--env_name', type=str, default='MultiGrid-CTF-Classic-v0',
       help='Name of multi-agent environment.')
   return parser.parse_args()
 

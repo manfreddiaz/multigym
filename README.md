@@ -32,3 +32,5 @@ The environment being run can be selected with the `--env_name` option, eg:
 ```
 python -m manual_control_multiagent.py --env_name MultiGrid-DoorKey-16x16-v0
 ```
+## Implemented Environments
+

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='multigym',
     version='0.1',
-    packages=['multigym'],
+    packages=find_packages(),
     install_requires=[
         "gym>=0.17.3",
         "gym-minigrid==1.0.1"

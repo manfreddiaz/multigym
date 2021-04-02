@@ -1,0 +1,1 @@
+from .captureflag import CapturingTheFlag
