@@ -26,6 +26,7 @@ class TeamAgent(multigrid.Agent):
         self.team_color = team_color
         self.team_id = team_id
 
+
     def render(self, img):
         tri_fn = rendering.point_in_triangle(
             (0.12, 0.19),
@@ -61,6 +62,9 @@ class Flag(minigrid.WorldObj):
 
     def can_pickup(self):
         return True
+
+    def can_overlap(self):
+        return False
 
 
 class Ray(minigrid.Wall):

@@ -41,7 +41,7 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
                  players_per_team,
                  scores_to_win,
                  player_health=3,
-                 player_respawn=20,
+                 player_respawn=5,
                  grid_size=None,
                  width=None,
                  height=None,
@@ -68,6 +68,7 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
         self.players_per_team = players_per_team
         self.scores_to_win = scores_to_win
         self.player_health = player_health
+        self.player_respawn = player_respawn
 
         self.base_arena = labmaze.RandomMaze(
             width=width,
@@ -123,21 +124,24 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
         self.teams = {}
         self.beams = {}
         self.health = {}
+        self.respawn = {}
 
         for agent_id in range(self.n_agents):
             team_preferences = self._get_team_preference_for_player(self.spawn_points[agent_id])
             team = team_preferences[0]  # TODO: Improve team selection
             self.teams[agent_id] = team
+            agent_obj = TeamAgent(
+                agent_id=agent_id,
+                state=self._rand_int(0, 4),
+                team_id=team,
+                team_color=self.teams_colors[team]
+            )
             self.place_agent_at_pos(
                 agent_id,
                 self.spawn_points[agent_id],
-                agent_obj=TeamAgent(
-                    agent_id=agent_id,
-                    state=self._rand_int(0, 4),
-                    team_id=team,
-                    team_color=self.teams_colors[team]
-                )
+                agent_obj=agent_obj
             )
+            agent_obj.init_pos = self.spawn_points[agent_id]
             self.health[agent_id] = self.player_health
 
     def _get_team_preference_for_player(self, agent_pos):
@@ -147,10 +151,53 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
         fwd_cell = self.grid.get(*fwd_pos)
 
         if fwd_cell and fwd_cell.can_pickup():
-            super(CapturingTheFlag, self)._pickup(agent_id, fwd_pos)
-            return fwd_cell
+            if isinstance(fwd_cell, Flag):
+                if fwd_cell.team_id == self.teams[agent_id] and not np.array_equal(fwd_cell.cur_pos, fwd_cell.init_pos):
+                    # verify that the cell of initial pos is emtpy
+                    if not self.grid.get(*fwd_cell.init_pos):
+                        self.grid.set(fwd_cell.cur_pos[0], fwd_cell.cur_pos[1], None)
+                        np.copyto(fwd_cell.cur_pos, fwd_cell.init_pos)
+                        self.grid.set(fwd_cell.cur_pos[0], fwd_cell.cur_pos[1], fwd_cell)
+                        return fwd_cell
+                elif fwd_cell.team_id != self.teams[agent_id]:
+                    super(CapturingTheFlag, self)._pickup(agent_id, fwd_pos)
 
         return None
+
+    def _forward(self, agent_id, fwd_pos):
+        """Attempts to move the forward one cell, returns True if successful."""
+        fwd_cell = self.grid.get(*fwd_pos)
+        # Make sure agents can't walk into each other
+        agent_blocking = False
+        for a in range(self.n_agents):
+            if a != agent_id and np.array_equal(self.agent_pos[a], fwd_pos):
+                agent_blocking = True
+
+        # Deal with object interactions
+        if not agent_blocking and fwd_cell is None or fwd_cell.can_overlap():
+            self.move_agent(agent_id, fwd_pos)
+            return True
+
+        return False
+
+    def _drop(self, agent_id, fwd_pos):
+        dropped = super(CapturingTheFlag, self)._drop(agent_id, fwd_pos)
+        if not dropped and self.carrying[agent_id]:  # couldn't drop, agent is carrying
+            fwd_cell = self.grid.get(*fwd_pos)
+            # verify if forward cell is the agent's flag and it's on the base
+            if isinstance(fwd_cell, Flag) and fwd_cell.team_id == self.teams[agent_id] and fwd_cell.cur_pos == fwd_cell.init_pos:
+                # return carrying flag to other team's base
+                carrying_flag = self.carrying[agent_id]
+                np.copyto(carrying_flag.cur_pos, carrying_flag.init_pos)
+                self.grid.set(carrying_flag.cur_pos[0], carrying_flag.cur_pos[1], carrying_flag)
+                # the agent is no longer carrying the other team's flag
+                self.carrying[agent_id] = None
+                agent_pos = self.agent_pos[agent_id]
+                agent = self.grid.get(*agent_pos)
+                agent.contains = None
+                return True
+
+        return False
 
     def _ray_cast(self, agent_id):
         ray = []
@@ -176,11 +223,20 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
 
         return tagged_object
 
-    def _drop(self, agent_id, fwd_pos):
-        pass
-
     def step_one_agent(self, action, agent_id):
         reward = 0
+
+        if agent_id in self.respawn:
+            if self.respawn[agent_id]['count'] > 0:
+                # TODO(manfred) receive collective reward.
+                self.respawn[agent_id]['count'] -= 1
+                return reward
+            else:
+                agent_info = self.respawn.pop(agent_id)
+                agent_pos = self.agent_pos[agent_id]
+                self.grid.set(agent_pos[0], agent_pos[1], agent_info['agent'])
+                # TODO(manfred) solve bug that when respawning an agent there may be another object on that position
+                # this is solvable by placing the agent on the spawning places of the team
 
         # Get the position in front of the agent
         fwd_pos = self.front_pos[agent_id]
@@ -210,16 +266,17 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
 
         # Pick up an object
         elif action == self.actions.pickup:
-            picked_object = self._pickup(agent_id, fwd_pos)
-            if picked_object:
-                if picked_object.team_id == self.teams[agent_id]:
-                    reward += EVENTS['flag_return'] if picked_object.cur_pos != picked_object.init_pos else 0.0
+            picked_flag = self._pickup(agent_id, fwd_pos)
+            if picked_flag:
+                if picked_flag.team_id == self.teams[agent_id]:
+                    reward += EVENTS['flag_return']
                 else:
                     reward += EVENTS['flag_pickup']
 
         # Drop an object
         elif action == self.actions.drop:
-            self._drop(agent_id, fwd_pos)
+            if self._drop(agent_id, fwd_pos):
+                reward += EVENTS['flag_capture']
 
         # Toggle/activate an object
         elif action == self.actions.toggle:
@@ -229,22 +286,43 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
             tagged_object = self._tag(agent_id, fwd_pos)
             if isinstance(tagged_object, TeamAgent) and tagged_object.team_id != self.teams[agent_id]:
                 tagged_agent: TeamAgent = tagged_object
-                if tagged_agent.contains.team_id == self.teams[agent_id]:  # if the tagged agent had my team's flag
-                    reward += EVENTS['tag_with_flag']
+
+                self.health[tagged_agent.agent_id] -= 1
+                # TODO(manfred) interesting problem here, there is a difference in reward structure
+                # one interpretation is to give reward for every time the agent tags another with / without flag
+                # or only when the tag effectively returns the flag
+                # a possible extension is for multiple teams: give reward for tagging even if the flag is another team
+                if self.carrying[tagged_agent.agent_id]:
+                    if tagged_agent.contains.team_id == self.teams[agent_id]:  # if the tagged agent had my team's flag
+                        reward += EVENTS['tag_with_flag']
+                    else:
+                        reward += EVENTS['tag_without_flag']  # tag if has the flag of another team
                 else:
                     reward += EVENTS['tag_without_flag']
-                self.health[tagged_agent.agent_id] -= 1
                 if self.health[tagged_agent.agent_id] == 0:
+                    # remove player from grid
                     self.grid.set(tagged_agent.cur_pos[0], tagged_agent.cur_pos[1], None)
-                    tagged_agent.cur_pos = (-1, -1)
+
+                    if self.carrying[tagged_agent.agent_id]:
+                        flag = self.carrying[tagged_agent.agent_id]
+                        np.copyto(flag.cur_pos, tagged_agent.cur_pos)
+                        self.grid.set(flag.cur_pos[0], flag.cur_pos[1], flag)
+                        self.carrying[tagged_agent.agent_id] = None
+                        tagged_agent.contains = None
+                    # TODO(manfred) after being dropped the flag disappears
+                    # TODO(manfred) test respawn and flag dropping
+                    # player's inactive
+                    self.respawn[tagged_agent.agent_id] = {
+                        'count': self.player_respawn,
+                        'agent': tagged_agent
+                    }
+                    np.copyto(self.agent_pos[tagged_agent.agent_id], tagged_agent.init_pos)
                     self.health[tagged_agent.agent_id] = self.player_health
-                    # TODO(manfred) Recover from death after some timesteps
 
 
         # Done action -- by default acts as no-op.
         elif action == self.actions.no_op:
             pass
-
         else:
             assert False, 'unknown action'
 
