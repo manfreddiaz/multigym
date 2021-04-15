@@ -1,7 +1,8 @@
 # TODO
 
 - [ ] Implement collective rewards.
-- [ ] Environment resets. 
-- [ ] Environment randomization.
+- [x] Environment resets. 
+- [x] Environment randomization.
+- [x] Environment construction by McKee et al. 
 - [ ] Unit tests.
-- [ ] Improve team logic and spawning points.
+- [x] Improve team logic and spawning points.

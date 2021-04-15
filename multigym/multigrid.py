@@ -42,10 +42,10 @@ import numpy as np
 
 # Map of color names to RGB values
 AGENT_COLOURS = [
-    np.array([60, 182, 234]),  # Blue
     np.array([229, 52, 52]),  # Red
-    np.array([144, 32, 249]),  # Purple
     np.array([69, 196, 60]),  # Green
+    np.array([60, 182, 234]),  # Blue
+    np.array([144, 32, 249]),  # Purple
     np.array([252, 227, 35]),  # Yellow
 ]
 
@@ -56,7 +56,7 @@ class WorldObj(minigrid.WorldObj):
   def __init__(self, obj_type, color=None):
     assert obj_type in minigrid.OBJECT_TO_IDX, obj_type
     self.type = obj_type
-    if color:
+    if color is not None:
       assert color in minigrid.COLOR_TO_IDX, color
       self.color = color
 
@@ -381,7 +381,7 @@ class MultiGridEnv(minigrid.MiniGridEnv):
       self.competitive = True
 
     # Action enumeration for this environment
-    self.actions = MultiGridEnv.Actions
+    self.actions = self._get_actions()
 
     # Number of cells (width and height) in the agent view
     self.agent_view_size = agent_view_size
@@ -462,6 +462,9 @@ class MultiGridEnv(minigrid.MiniGridEnv):
 
     # Initialize the state
     self.reset()
+
+  def _get_actions(self):
+    return MultiGridEnv.Actions
 
   def reset(self):
     if self.fixed_environment:
@@ -851,7 +854,7 @@ class MultiGridEnv(minigrid.MiniGridEnv):
     # Retrieve agent object
     pos = self.agent_pos[agent_id]
     agent_obj = self.grid.get(pos[0], pos[1])
-    assert agent_obj.agent_id == agent_id
+    assert agent_obj.agent_id == agent_id, type(agent_obj)
 
     # Update the dir
     agent_obj.dir = self.agent_dir[agent_id]
@@ -1144,7 +1147,8 @@ class MultiGridEnv(minigrid.MiniGridEnv):
       return None
 
     if mode == 'human' and not self.window:
-      self.window = minigrid.window.Window('gym_minigrid')
+      import gym_minigrid.window
+      self.window = gym_minigrid.window.Window('gym_minigrid')
       self.window.show(block=False)
 
     if highlight:
