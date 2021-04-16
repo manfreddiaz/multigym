@@ -110,6 +110,8 @@ def main(args):
     if actions == -1:
       env.reset()
       reward_hist = []
+      plt.imshow(env.render('rgb_array'))
+      plt.pause(0.1)
       continue
 
     _, rewards, done, _ = env.step(actions)

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 import multigym.ctf
 
-SAMPLES = 50
+SAMPLES = 500
 
 
 def main():

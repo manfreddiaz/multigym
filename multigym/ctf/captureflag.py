@@ -68,7 +68,7 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
         self.player_health = player_health
         self.player_respawn = player_respawn
 
-        self.base_arena = ArenaGenerator()
+        self.base_arena = ArenaGenerator(seed=seed)
         self.listeners = []
 
         super().__init__(
@@ -85,8 +85,6 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
             minigrid_mode=False,
             fully_observed=False
         )
-
-
 
     def _get_actions(self):
         return CaptureFlagClassicEnv.Actions
@@ -254,9 +252,9 @@ class CapturingTheFlag(multigrid.MultiGridEnv):
             is_holding = tagged.is_holding
             if not tagged.health:
                 self.grid.set(tagged.cur_pos[0], tagged.cur_pos[1], None)
+                self.respawn_pool.add_player(tagged)
                 if is_holding:
                     self._drop(tagged.agent_id, tagged.cur_pos)
-                self.respawn_pool.add_player(tagged)
 
             if is_tagged and is_holding:
                 return self._emit('tag_with_flag', agent_id)

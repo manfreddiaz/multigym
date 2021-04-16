@@ -145,7 +145,7 @@ class ArenaGenerator:
         return ''.join(str_rpr)
 
     def _is_valid(self, arena, red_team, blue_team):
-        distances = distance_from(arena, red_team.flag.init_pos, blue_team.flag.init_pos)
+        distances = distance_from(arena, red_team.flag.init_pos[::-1], blue_team.flag.init_pos[::-1])
         distance_from_bases = distances[blue_team.flag.init_pos[1], blue_team.flag.init_pos[0]]
         return distance_from_bases != np.infty and distance_from_bases > 6
 
